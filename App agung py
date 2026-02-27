@@ -1,0 +1,31 @@
+import streamlit as st
+import google.generativeai as genai
+
+# Tampilan Aplikasi
+st.set_page_config(page_title="Fridays AI", page_icon="🤖")
+st.title("🤖 Asisten Pribadi Fridays")
+
+# Masukkan API Key
+genai.configure(api_key="AIzaSyBkd4hV62OCNyzHKVxLV4wii8xwDHCh7dE")
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+# Tempat Chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Menampilkan riwayat chat
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# Input User
+if prompt := st.chat_input("Apa misi kita hari ini, Fridays?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # Respon AI
+    with st.chat_message("assistant"):
+        response = model.generate_content(prompt)
+        st.markdown(response.text)
+        st.session_state.messages.append({"role": "assistant", "content": response.text})
